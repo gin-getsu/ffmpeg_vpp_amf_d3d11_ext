@@ -1,0 +1,101 @@
+--- a/libavfilter/vf_amf_common.h	2025-12-01 19:04:10.901596700 +0900
++++ b/libavfilter/vf_amf_common.h	2026-01-08 22:27:01.220489400 +0900
+@@ -25,6 +25,23 @@
+ #include "AMF/components/Component.h"
+ #include "libavutil/hwcontext_amf.h"
+ 
++#ifdef VF_VPP_AMF_D3D11_HWACCEL
++#undef VF_VPP_AMF_D3D11_HWACCEL
++#define VF_VPP_AMF_D3D11_HWACCEL 1
++#endif
++
++#if VF_VPP_AMF_D3D11_HWACCEL
++#include <d3d11.h>
++
++enum {
++    VPP_AMF_DEINT_OFF = 0,
++    VPP_AMF_DEINT_FAST,
++    VPP_AMF_DEINT_ADAPTIVE,
++};
++
++#define VF_VPP_AMF_D3D11_DEINT_FRAMES_MAX 16
++#endif
++
+ typedef struct AMFFilterContext {
+     const AVClass *class;
+ 
+@@ -59,6 +76,64 @@
+ 
+     AVAMFDeviceContext  *amf_device_ctx;
+     int                  local_context;
++
++#if VF_VPP_AMF_D3D11_HWACCEL
++    /* ---------------- D3D11 VideoProcessor pre-process ---------------- */
++
++    /* D3D11 core */
++    ID3D11Device               *d3d11_device;
++    ID3D11DeviceContext        *d3d11_context;
++
++    /* D3D11 video interfaces */
++    ID3D11VideoDevice          *d3d11_video_device;
++    ID3D11VideoContext         *d3d11_video_context;
++    ID3D11VideoProcessorEnumerator *d3d11_vp_enum;
++    ID3D11VideoProcessor       *d3d11_vp;
++
++    /* D3D11 video processor interfaces */
++    ID3D11Texture2D            *d3d11_tex_in[VF_VPP_AMF_D3D11_DEINT_FRAMES_MAX];
++    ID3D11Texture2D            *d3d11_tex_out;
++    ID3D11VideoProcessorInputView  *d3d11_in_view[VF_VPP_AMF_D3D11_DEINT_FRAMES_MAX];
++    ID3D11VideoProcessorOutputView *d3d11_out_view;
++
++    /* Deinterlace mode */
++    int                         d3d11_deint;              /* 0=off, 1=fast, 2=adaptive */
++    int                         d3d11_deint_frame_format; /* 0=auto, 1=tff, 2=bff */
++
++    int                         deint_frames_min;
++    int                         deint_frames_max;
++    int                         deint_frames_cur;
++    int                         deint_frames_new;
++    int                         deint_frames_que;
++    int                         deint_frames;
++    D3D11_VIDEO_FRAME_FORMAT    deint_frames_format[VF_VPP_AMF_D3D11_DEINT_FRAMES_MAX];
++    AVFrame                    *deint_frame_last;
++    int                         deint_frame_eof;
++
++    /* Crop parameters */
++    int                         crop_x;
++    int                         crop_y;
++    int                         crop_w;
++    int                         crop_h;
++
++    /* Derived sizes */
++    int                         crop_w_eff;   /* cw */
++    int                         crop_h_eff;   /* ch */
++
++    /* frame input SAR */
++    DXGI_RATIONAL               dxgi_in_sar;
++
++    /* centor of target */
++    int                         dest_x;       /* dx */
++    int                         dest_y;       /* dy */
++
++    /* target sizes */
++    int                         target_w;     /* dw */
++    int                         target_h;     /* dh */
++
++    /* D3D11 VP state */
++    int                         d3d11_log_info;
++#endif // VF_VPP_AMF_D3D11_HWACCEL
+ } AMFFilterContext;
+ 
+ int amf_filter_init(AVFilterContext *avctx);
+@@ -71,4 +146,9 @@
+ int amf_setup_input_output_formats(AVFilterContext *avctx, const enum AVPixelFormat *input_pix_fmts, const enum AVPixelFormat *output_pix_fmts);
+ int amf_filter_filter_frame(AVFilterLink *inlink, AVFrame *in);
+ 
++#if VF_VPP_AMF_D3D11_HWACCEL
++int amf_d3d11_preprocess_required(AVFilterContext *avctx);
++int amf_activate(AVFilterContext *avctx);
++#endif // VF_VPP_AMF_D3D11_HWACCEL
++
+ #endif /* AVFILTER_AMF_COMMON_H */

@@ -1,0 +1,56 @@
+--- a/libavfilter/vf_vpp_amf.c	2025-12-01 19:04:13.745691700 +0900
++++ b/libavfilter/vf_vpp_amf.c	2026-01-13 12:04:47.412535300 +0900
+@@ -223,12 +223,32 @@
+     { "force_divisible_by", "enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1}, 1, 256, FLAGS },
+     { "reset_sar", "reset SAR to 1 and scale to square pixels if scaling proportionally", OFFSET(reset_sar), AV_OPT_TYPE_BOOL, { .i64 = 0}, 0, 1, FLAGS },
+ 
++#if VF_VPP_AMF_D3D11_HWACCEL
++    /* ---------------- crop parameters ---------------- */
++    { "cx", "crop start x", OFFSET(crop_x), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, FLAGS },
++    { "cy", "crop start y", OFFSET(crop_y), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, FLAGS },
++    { "cw", "crop width",   OFFSET(crop_w), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, FLAGS },
++    { "ch", "crop height",  OFFSET(crop_h), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, FLAGS },
++
++    /* ---------------- deinterlace -------------------- */
++    { "deint", "deinterlace mode", OFFSET(d3d11_deint), AV_OPT_TYPE_INT, { .i64 = VPP_AMF_DEINT_OFF }, VPP_AMF_DEINT_OFF, VPP_AMF_DEINT_ADAPTIVE, FLAGS, "deint" },
++    { "off",      "disable deinterlace",            0,  AV_OPT_TYPE_CONST, { .i64 = VPP_AMF_DEINT_OFF },      0, 0, FLAGS, "deint" },
++    { "fast",     "fast deinterlace (driver auto)", 0,  AV_OPT_TYPE_CONST, { .i64 = VPP_AMF_DEINT_FAST },     0, 0, FLAGS, "deint" },
++    { "adaptive", "adaptive deinterlace",           0,  AV_OPT_TYPE_CONST, { .i64 = VPP_AMF_DEINT_ADAPTIVE }, 0, 0, FLAGS, "deint" },
++
++    { "deint_frame_format", "deinterlace input frame format", OFFSET(d3d11_deint_frame_format), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 2, FLAGS, "deint_frame_format" },
++    { "auto", "auto-detect field order",            0,  AV_OPT_TYPE_CONST, { .i64 = 0 }, 0, 0, FLAGS, "deint_frame_format" },
++    { "tff",  "top field first",                    0,  AV_OPT_TYPE_CONST, { .i64 = 1 }, 0, 0, FLAGS, "deint_frame_format" },
++    { "bff",  "bottom field first",                 0,  AV_OPT_TYPE_CONST, { .i64 = 2 }, 0, 0, FLAGS, "deint_frame_format" },
++#endif
++
+     { NULL },
+ };
+ 
+ 
+ AVFILTER_DEFINE_CLASS(vpp_amf);
+ 
++#ifndef VF_VPP_AMF_D3D11_HWACCEL
+ static const AVFilterPad amf_filter_inputs[] = {
+     {
+         .name         = "default",
+@@ -236,6 +256,7 @@
+         .filter_frame = amf_filter_filter_frame,
+     }
+ };
++#endif // VF_VPP_AMF_D3D11_HWACCEL
+ 
+ static const AVFilterPad amf_filter_outputs[] = {
+     {
+@@ -253,7 +274,12 @@
+     .priv_size = sizeof(AMFFilterContext),
+     .init          = amf_filter_init,
+     .uninit        = amf_filter_uninit,
++#if VF_VPP_AMF_D3D11_HWACCEL
++    .activate      = amf_activate,
++    FILTER_INPUTS(ff_video_default_filterpad),
++#else  // VF_VPP_AMF_D3D11_HWACCEL
+     FILTER_INPUTS(amf_filter_inputs),
++#endif // VF_VPP_AMF_D3D11_HWACCEL
+     FILTER_OUTPUTS(amf_filter_outputs),
+     FILTER_QUERY_FUNC(amf_filter_query_formats),
+     .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
