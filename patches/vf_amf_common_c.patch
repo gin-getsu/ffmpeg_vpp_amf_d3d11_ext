@@ -1,5 +1,5 @@
---- a/libavfilter/vf_amf_common.c	2025-12-01 19:04:10.896501800 +0900
-+++ b/libavfilter/vf_amf_common.c	2026-01-14 16:28:24.935904600 +0900
+--- a/libavfilter/vf_amf_common.c	2026-03-27 12:23:24.275810600 +0900
++++ b/libavfilter/vf_amf_common.c	2026-03-27 12:26:16.234020200 +0900
 @@ -38,6 +38,1241 @@
  #include <d3d11.h>
  #endif
@@ -1242,7 +1242,7 @@
  int amf_filter_init(AVFilterContext *avctx)
  {
      AMFFilterContext     *ctx = avctx->priv;
-@@ -69,6 +1304,10 @@
+@@ -75,6 +1310,10 @@
      av_buffer_unref(&ctx->hwdevice_ref);
      av_buffer_unref(&ctx->hwframes_in_ref);
      av_buffer_unref(&ctx->hwframes_out_ref);
@@ -1253,7 +1253,7 @@
  }
  
  int amf_filter_filter_frame(AVFilterLink *inlink, AVFrame *in)
-@@ -93,6 +1332,66 @@
+@@ -99,6 +1338,66 @@
      if (ret < 0)
          goto fail;
  
@@ -1320,9 +1320,9 @@
      res = ctx->component->pVtbl->SubmitInput(ctx->component, (AMFData*)surface_in);
      surface_in->pVtbl->Release(surface_in); // release surface after use
      AMF_GOTO_FAIL_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "SubmitInput() failed with error %d\n", res);
-@@ -148,6 +1447,19 @@
-     if (ctx->trc != AMF_COLOR_TRANSFER_CHARACTERISTIC_UNDEFINED)
-         out->color_trc = ctx->trc;
+@@ -157,6 +1456,19 @@
+     if (ctx->out_trc != AMF_COLOR_TRANSFER_CHARACTERISTIC_UNDEFINED)
+         out->color_trc = ctx->out_trc;
  
 +#if VF_VPP_AMF_D3D11_HWACCEL
 +    if (amf_d3d11_preprocess_required(avctx)) {
@@ -1340,7 +1340,7 @@
  
      if (ret < 0)
          goto fail;
-@@ -277,6 +1589,28 @@
+@@ -286,6 +1598,28 @@
                                          &ctx->width, &ctx->height)) < 0)
          return err;
  
@@ -1369,7 +1369,7 @@
      if (ctx->reset_sar && inlink->sample_aspect_ratio.num)
          w_adj = (double) inlink->sample_aspect_ratio.num / inlink->sample_aspect_ratio.den;
  
-@@ -516,6 +1850,20 @@
+@@ -591,6 +1925,20 @@
      }
  
      surface->pVtbl->SetPts(surface, frame->pts);

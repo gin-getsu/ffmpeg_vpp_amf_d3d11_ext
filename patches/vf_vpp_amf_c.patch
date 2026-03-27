@@ -1,6 +1,6 @@
---- a/libavfilter/vf_vpp_amf.c	2025-12-01 19:04:13.745691700 +0900
-+++ b/libavfilter/vf_vpp_amf.c	2026-01-13 12:04:47.412535300 +0900
-@@ -223,12 +223,32 @@
+--- a/libavfilter/vf_vpp_amf.c	2026-03-27 12:23:28.905222400 +0900
++++ b/libavfilter/vf_vpp_amf.c	2026-03-27 13:15:53.639601800 +0900
+@@ -269,6 +269,25 @@
      { "force_divisible_by", "enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1}, 1, 256, FLAGS },
      { "reset_sar", "reset SAR to 1 and scale to square pixels if scaling proportionally", OFFSET(reset_sar), AV_OPT_TYPE_BOOL, { .i64 = 0}, 0, 1, FLAGS },
  
@@ -26,31 +26,23 @@
      { NULL },
  };
  
- 
- AVFILTER_DEFINE_CLASS(vpp_amf);
- 
-+#ifndef VF_VPP_AMF_D3D11_HWACCEL
- static const AVFilterPad amf_filter_inputs[] = {
+@@ -279,7 +298,9 @@
      {
          .name         = "default",
-@@ -236,6 +256,7 @@
+         .type         = AVMEDIA_TYPE_VIDEO,
++#ifndef VF_VPP_AMF_D3D11_HWACCEL
          .filter_frame = amf_filter_filter_frame,
++#endif // VF_VPP_AMF_D3D11_HWACCEL
      }
  };
-+#endif // VF_VPP_AMF_D3D11_HWACCEL
  
- static const AVFilterPad amf_filter_outputs[] = {
-     {
-@@ -253,7 +274,12 @@
+@@ -299,6 +320,9 @@
      .priv_size = sizeof(AMFFilterContext),
      .init          = amf_filter_init,
      .uninit        = amf_filter_uninit,
 +#if VF_VPP_AMF_D3D11_HWACCEL
 +    .activate      = amf_activate,
-+    FILTER_INPUTS(ff_video_default_filterpad),
-+#else  // VF_VPP_AMF_D3D11_HWACCEL
-     FILTER_INPUTS(amf_filter_inputs),
 +#endif // VF_VPP_AMF_D3D11_HWACCEL
+     FILTER_INPUTS(amf_filter_inputs),
      FILTER_OUTPUTS(amf_filter_outputs),
      FILTER_QUERY_FUNC(amf_filter_query_formats),
-     .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,

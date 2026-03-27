@@ -1,8 +1,8 @@
---- a/libavfilter/vf_amf_common.h	2025-12-01 19:04:10.901596700 +0900
-+++ b/libavfilter/vf_amf_common.h	2026-01-08 22:27:01.220489400 +0900
-@@ -25,6 +25,23 @@
- #include "AMF/components/Component.h"
+--- ffmpeg/libavfilter/vf_amf_common.h.orig	2026-03-27 12:23:24.281032400 +0900
++++ ffmpeg/libavfilter/vf_amf_common.h	2026-03-27 12:26:16.269603000 +0900
+@@ -26,6 +26,23 @@
  #include "libavutil/hwcontext_amf.h"
+ #include "libavutil/mastering_display_metadata.h"
  
 +#ifdef VF_VPP_AMF_D3D11_HWACCEL
 +#undef VF_VPP_AMF_D3D11_HWACCEL
@@ -24,7 +24,7 @@
  typedef struct AMFFilterContext {
      const AVClass *class;
  
-@@ -59,6 +76,64 @@
+@@ -66,6 +83,64 @@
  
      AVAMFDeviceContext  *amf_device_ctx;
      int                  local_context;
@@ -89,7 +89,7 @@
  } AMFFilterContext;
  
  int amf_filter_init(AVFilterContext *avctx);
-@@ -71,4 +146,9 @@
+@@ -78,4 +153,9 @@
  int amf_setup_input_output_formats(AVFilterContext *avctx, const enum AVPixelFormat *input_pix_fmts, const enum AVPixelFormat *output_pix_fmts);
  int amf_filter_filter_frame(AVFilterLink *inlink, AVFrame *in);
  
