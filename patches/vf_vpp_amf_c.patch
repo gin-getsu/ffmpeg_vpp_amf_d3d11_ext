@@ -1,6 +1,6 @@
---- a/libavfilter/vf_vpp_amf.c	2026-03-27 12:23:28.905222400 +0900
-+++ b/libavfilter/vf_vpp_amf.c	2026-03-27 13:15:53.639601800 +0900
-@@ -269,6 +269,25 @@
+--- ./patches/original/vf_vpp_amf.c	2026-03-27 12:23:28.905222400 +0900
++++ ./patches/patched/vf_vpp_amf.c	2026-04-15 10:10:30.652625200 +0900
+@@ -269,6 +269,30 @@
      { "force_divisible_by", "enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1}, 1, 256, FLAGS },
      { "reset_sar", "reset SAR to 1 and scale to square pixels if scaling proportionally", OFFSET(reset_sar), AV_OPT_TYPE_BOOL, { .i64 = 0}, 0, 1, FLAGS },
  
@@ -10,6 +10,11 @@
 +    { "cy", "crop start y", OFFSET(crop_y), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, FLAGS },
 +    { "cw", "crop width",   OFFSET(crop_w), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, FLAGS },
 +    { "ch", "crop height",  OFFSET(crop_h), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, FLAGS },
++
++    /* ---------------- scale adjust ------------------- */
++    { "scale_adjust", "set aspect ratio adjustment mode", OFFSET(scale_adjust), AV_OPT_TYPE_INT, { .i64 = VPP_AMF_SCALE_ADJUST_STRETCH }, VPP_AMF_SCALE_ADJUST_STRETCH, VPP_AMF_SCALE_ADJUST_PADDING, FLAGS, "scale_adj" },
++    { "stretch",      "stretch to fit the output resolution",    0,  AV_OPT_TYPE_CONST, { .i64 = VPP_AMF_SCALE_ADJUST_STRETCH }, 0, 0, FLAGS, "scale_adj" },
++    { "padding",      "add black bars to preserve aspect ratio", 0,  AV_OPT_TYPE_CONST, { .i64 = VPP_AMF_SCALE_ADJUST_PADDING }, 0, 0, FLAGS, "scale_adj" },
 +
 +    /* ---------------- deinterlace -------------------- */
 +    { "deint", "deinterlace mode", OFFSET(d3d11_deint), AV_OPT_TYPE_INT, { .i64 = VPP_AMF_DEINT_OFF }, VPP_AMF_DEINT_OFF, VPP_AMF_DEINT_ADAPTIVE, FLAGS, "deint" },
@@ -26,7 +31,7 @@
      { NULL },
  };
  
-@@ -279,7 +298,9 @@
+@@ -279,7 +303,9 @@
      {
          .name         = "default",
          .type         = AVMEDIA_TYPE_VIDEO,
@@ -36,7 +41,7 @@
      }
  };
  
-@@ -299,6 +320,9 @@
+@@ -299,6 +325,9 @@
      .priv_size = sizeof(AMFFilterContext),
      .init          = amf_filter_init,
      .uninit        = amf_filter_uninit,

@@ -1,6 +1,6 @@
---- ffmpeg/libavfilter/vf_amf_common.h.orig	2026-03-27 12:23:24.281032400 +0900
-+++ ffmpeg/libavfilter/vf_amf_common.h	2026-03-27 12:26:16.269603000 +0900
-@@ -26,6 +26,23 @@
+--- ./patches/original/vf_amf_common.h	2026-03-27 12:23:24.281032400 +0900
++++ ./patches/patched/vf_amf_common.h	2026-04-15 10:10:27.403433500 +0900
+@@ -26,6 +26,28 @@
  #include "libavutil/hwcontext_amf.h"
  #include "libavutil/mastering_display_metadata.h"
  
@@ -18,13 +18,18 @@
 +    VPP_AMF_DEINT_ADAPTIVE,
 +};
 +
++enum {
++    VPP_AMF_SCALE_ADJUST_STRETCH = 0,
++    VPP_AMF_SCALE_ADJUST_PADDING,
++};
++
 +#define VF_VPP_AMF_D3D11_DEINT_FRAMES_MAX 16
 +#endif
 +
  typedef struct AMFFilterContext {
      const AVClass *class;
  
-@@ -66,6 +83,64 @@
+@@ -66,6 +88,67 @@
  
      AVAMFDeviceContext  *amf_device_ctx;
      int                  local_context;
@@ -83,13 +88,16 @@
 +    int                         target_w;     /* dw */
 +    int                         target_h;     /* dh */
 +
++    /* scale adjust */
++    int                         scale_adjust;
++
 +    /* D3D11 VP state */
 +    int                         d3d11_log_info;
 +#endif // VF_VPP_AMF_D3D11_HWACCEL
  } AMFFilterContext;
  
  int amf_filter_init(AVFilterContext *avctx);
-@@ -78,4 +153,9 @@
+@@ -78,4 +161,9 @@
  int amf_setup_input_output_formats(AVFilterContext *avctx, const enum AVPixelFormat *input_pix_fmts, const enum AVPixelFormat *output_pix_fmts);
  int amf_filter_filter_frame(AVFilterLink *inlink, AVFrame *in);
  
