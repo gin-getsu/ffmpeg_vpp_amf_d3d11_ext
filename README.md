@@ -1,9 +1,10 @@
 # [ffmpeg_vpp_amf_d3d11_ext](https://github.com/gin-getsu/ffmpeg_vpp_amf_d3d11_ext)
-Extended vpp_amf filter with D3D11-based deinterlace and crop for ffmpeg
+Extended vpp_amf filter with D3D11-based deinterlace and crop for ffmpeg  
+[(github pages)](https://gin-getsu.github.io/ffmpeg_vpp_amf_d3d11_ext)
 
 ## 1. Overview of This Extension
 
-- Adds **D3D11-based deinterlace and crop functionality** to ffmpeg’s `vpp_amf` filter  
+- Add **D3D11-based GPU zero-copy deinterlace and crop functionality** to ffmpeg’s `vpp_amf` filter  
 - Includes three patch files for:  
   - `vf_amf_common.c`  
   - `vf_amf_common.h`  
