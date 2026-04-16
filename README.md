@@ -21,7 +21,7 @@ Extended vpp_amf filter with D3D11-based deinterlace and crop for ffmpeg
 ```bash
 ffmpeg -hwaccel amf -i "input.m2ts" \
   -c:v hevc_amf \
-  -vf "vpp_amf=w=1920:h=720:reset_sar=true;deint=fast:deint_frame_format=tff:format=nv12:cx=0:cy=139:cw=1920:ch=802" \
+  -vf "vpp_amf=w=1920:h=720:deint=fast:deint_frame_format=tff:format=nv12:cx=0:cy=139:cw=1920:ch=802" \
   -c:a copy -f mp4 "output.mp4"
 ```
 
@@ -30,7 +30,7 @@ ffmpeg -hwaccel amf -i "input.m2ts" \
 ```bash
 ffmpeg -i "input.m2ts" \
   -c:v hevc_amf \
-  -vf "format=nv12, vpp_amf=w=1920:h=720:reset_sar=true;deint=fast:deint_frame_format=tff:format=nv12:cx=0:cy=139:cw=1920:ch=802" \
+  -vf "format=nv12, vpp_amf=w=1920:h=720:deint=fast:deint_frame_format=tff:format=nv12:cx=0:cy=139:cw=1920:ch=802" \
   -c:a copy -f mp4 "output.mp4"
 ```
 
