@@ -1,5 +1,5 @@
---- ./patches/original/vf_vpp_amf.c	2026-03-27 12:23:28.905222400 +0900
-+++ ./patches/patched/vf_vpp_amf.c	2026-04-15 10:10:30.652625200 +0900
+--- a/libavfilter/vf_vpp_amf.c	2026-03-27 12:23:28.905222400 +0900
++++ a/libavfilter/vf_vpp_amf.c	2026-04-15 10:10:30.652625200 +0900
 @@ -269,6 +269,30 @@
      { "force_divisible_by", "enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1}, 1, 256, FLAGS },
      { "reset_sar", "reset SAR to 1 and scale to square pixels if scaling proportionally", OFFSET(reset_sar), AV_OPT_TYPE_BOOL, { .i64 = 0}, 0, 1, FLAGS },

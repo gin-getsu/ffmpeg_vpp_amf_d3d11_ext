@@ -1,5 +1,5 @@
---- ./patches/original/vf_amf_common.c	2026-03-27 12:23:24.275810600 +0900
-+++ ./patches/patched/vf_amf_common.c	2026-04-15 19:08:58.279662500 +0900
+--- a/libavfilter/vf_amf_common.c	2026-03-27 12:23:24.275810600 +0900
++++ a/libavfilter/vf_amf_common.c	2026-04-15 19:08:58.279662500 +0900
 @@ -38,6 +38,1254 @@
  #include <d3d11.h>
  #endif

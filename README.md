@@ -222,3 +222,10 @@ The following patterns have been confirmed regarding `w` (width) and `reset_sar`
 
 This patch follows the ffmpeg project’s license (GPL/LGPL).  
 Refer to the ffmpeg source tree for full license details.
+
+---
+
+## 10. Change Log
+
+`2026/04/27`  
+Added --enable-libplacebo to ffmpeg configure
