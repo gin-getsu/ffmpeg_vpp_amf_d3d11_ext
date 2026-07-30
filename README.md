@@ -231,5 +231,5 @@ Refer to the ffmpeg source tree for full license details.
 Added --enable-libplacebo to ffmpeg configure
 
 `2026/07/30`  
-Removed `--enable-libshaderc` from the FFmpeg configure options.
+Removed `--enable-libshaderc` from the FFmpeg configure options.  
 Switched to building `libplacebo` directly from source.
