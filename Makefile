@@ -35,8 +35,9 @@ MSYS2_PKGS := mingw-w64-x86_64-toolchain \
 	mingw-w64-x86_64-libvpx \
 	mingw-w64-x86_64-x264 \
 	mingw-w64-x86_64-xavs \
-	mingw-w64-x86_64-shaderc \
-	mingw-w64-x86_64-glslang
+	mingw-w64-x86_64-glslang \
+	mingw-w64-x86_64-libplacebo \
+	mingw-w64-x86_64-spirv-headers
 
 # === Source library list ===
 SRC_LIBS := \
@@ -49,7 +50,7 @@ SRC_LIBS := \
     opencl_loader \
     vulkan_header \
     vulkan_loader \
-    shaderc_static \
+    libplacebo \
     amf_sdk
 
 # Allowed DLL import symbols (regex) for .a static library purity check
@@ -94,7 +95,8 @@ ALLOWED_IMP_SYMBOLS := \
   __imp_GetFileType|\
   __imp_strtok_s|__imp_LoadLibraryW|__imp_SetDllDirectoryW|__imp_WideCharToMultiByte|__imp__wcsicmp|__imp_EnumFontFamiliesExW|__imp_GetDC|__imp_ReleaseDC|__imp_WideCharToMultiByte|__imp__strnicmp|__imp_SetThreadAffinityMask|__imp_tolower|__imp__findclose|__imp_WideCharToMultiByte|__imp_GetWindowsDirectoryW|__imp_SHGetFolderPathW|__imp_WideCharToMultiByte|__imp_FormatMessageW|__imp_GetModuleHandleExA|__imp_WideCharToMultiByte|__imp__wremove|__imp_CreateDirectoryW|__imp_fseeko64|__imp_ftello64|__imp_GetFileAttributesW|\
   __imp_LoadLibraryExA|__imp_RegEnumValueA|__imp_RegOpenKeyExA|__imp_GetSidSubAuthority|__imp_GetSidSubAuthorityCount|__imp_GetTokenInformation|__imp_OpenProcessToken|__imp_CM_Get_Child|__imp_CM_Get_Device_ID_List_SizeW|__imp_CM_Get_Device_ID_ListW|__imp_CM_Get_Device_IDW|__imp_CM_Get_DevNode_Registry_PropertyW|__imp_CM_Get_DevNode_Status|__imp_CM_Get_Sibling|__imp_CM_Locate_DevNodeW|__imp_CM_Open_DevNode_Key|__imp_RegQueryValueExA|__imp_wcscat_s|__imp_wcscpy_s|\
-  __imp_strtok
+  __imp_strtok|\
+  __imp__j1|__imp_PathRemoveFileSpecW|__imp_RtlCaptureStackBackTrace|__imp_VirtualQuery|__imp_CreateEventW|__imp_VerifyVersionInfoW|__imp_VerSetConditionMask|__imp_GetClientRect|__imp_VerifyVersionInfoW|__imp_VerSetConditionMask|__imp_LocalFree
 
 # Allowed DLL names (regex) for .exe whitelist check (lowercase)
 ALLOWED_DLLS := \
@@ -253,7 +255,7 @@ libxml2: $(ROOT)/libxml2/.stamp-libxml2
 $(ROOT)/libxml2/.stamp-libxml2:
 	@set -e; \
 	if [ ! -d $(ROOT)/libxml2 ]; then \
-		git clone https://gitlab.gnome.org/GNOME/libxml2.git $(ROOT)/libxml2; \
+		git clone --depth 1 https://gitlab.gnome.org/GNOME/libxml2.git $(ROOT)/libxml2; \
 	else \
 		echo "[OK] libxml2 already exists"; \
 	fi; \
@@ -283,7 +285,7 @@ $(ROOT)/libbluray/.stamp-libbluray:
 	@set -e; \
 	if [ ! -d $(ROOT)/libbluray/.git ]; then \
 		rm -rf $(ROOT)/libbluray; \
-		git clone https://code.videolan.org/videolan/libbluray.git $(ROOT)/libbluray; \
+		git clone --depth 1 https://code.videolan.org/videolan/libbluray.git $(ROOT)/libbluray; \
 	else \
 		echo "[OK] libbluray already exists"; \
 	fi; \
@@ -313,7 +315,7 @@ $(ROOT)/libjxl/.stamp-libjxl:
 	@set -e; \
 	if [ ! -d $(ROOT)/libjxl/.git ]; then \
 		rm -rf $(ROOT)/libjxl; \
-		git clone https://github.com/libjxl/libjxl.git $(ROOT)/libjxl; \
+		git clone --depth 1 https://github.com/libjxl/libjxl.git $(ROOT)/libjxl; \
 	fi; \
 	if [ ! -d $(ROOT)/libjxl/third_party/highway/.git ]; then \
 		git clone --depth 1 https://github.com/google/highway.git $(ROOT)/libjxl/third_party/highway; \
@@ -357,7 +359,7 @@ opencl_header: $(ROOT)/opencl_header/.stamp-opencl_header
 $(ROOT)/opencl_header/.stamp-opencl_header:
 	@set -e; \
 	if [ ! -d $(ROOT)/opencl_header ]; then \
-		git clone https://github.com/KhronosGroup/OpenCL-Headers.git $(ROOT)/opencl_header; \
+		git clone --depth 1 https://github.com/KhronosGroup/OpenCL-Headers.git $(ROOT)/opencl_header; \
 	else \
 		echo "[OK] OpenCL-Headers already exists"; \
 	fi; \
@@ -378,7 +380,7 @@ opencl_loader: opencl_header $(ROOT)/opencl_loader/.stamp-opencl_loader
 $(ROOT)/opencl_loader/.stamp-opencl_loader:
 	@set -e; \
 	if [ ! -d $(ROOT)/opencl_loader ]; then \
-		git clone --recursive https://github.com/KhronosGroup/OpenCL-ICD-Loader.git $(ROOT)/opencl_loader; \
+		git clone --depth 1 --recurse-submodules https://github.com/KhronosGroup/OpenCL-ICD-Loader.git $(ROOT)/opencl_loader; \
 	else \
 		echo "[OK] OpenCL ICD Loader already exists"; \
 	fi; \
@@ -412,7 +414,7 @@ $(ROOT)/vulkan_header/.stamp-vulkan_header:
 	echo "[INFO] Fetching and installing Vulkan-Headers..."; \
 	if [ ! -d $(ROOT)/vulkan_header ]; then \
 		echo "[INFO] Cloning Vulkan-Headers..."; \
-		git clone https://github.com/KhronosGroup/Vulkan-Headers.git $(ROOT)/vulkan_header; \
+		git clone --depth 1 https://github.com/KhronosGroup/Vulkan-Headers.git $(ROOT)/vulkan_header; \
 	else \
 		echo "[OK] Vulkan-Headers already exists"; \
 	fi; \
@@ -435,7 +437,7 @@ $(ROOT)/vulkan_loader/.stamp-vulkan_loader:
 	echo "[INFO] Fetching and building Vulkan-Loader..."; \
 	if [ ! -d $(ROOT)/vulkan_loader ]; then \
 		echo "[INFO] Cloning Vulkan-Loader..."; \
-		git clone https://github.com/KhronosGroup/Vulkan-Loader.git $(ROOT)/vulkan_loader; \
+		git clone --depth 1 https://github.com/KhronosGroup/Vulkan-Loader.git $(ROOT)/vulkan_loader; \
 	else \
 		echo "[OK] Vulkan-Loader already exists"; \
 	fi; \
@@ -454,20 +456,32 @@ $(ROOT)/vulkan_loader/.stamp-vulkan_loader:
 	$(call check_64bit,$(BUILD_DIR),$(BUILD_DIR)/lib/libvulkan-1.dll.a); \
 	touch $@
 
-## === shaderc static ===
-shaderc_static: $(BUILD_DIR)/lib/pkgconfig/shaderc.pc
-$(BUILD_DIR)/lib/pkgconfig/shaderc.pc:
+## === libplacebo ===
+libplacebo: $(ROOT)/libplacebo/.stamp-libplacebo
+$(ROOT)/libplacebo/.stamp-libplacebo:
 	@set -e; \
-	echo "prefix=/mingw64"                >  $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo "exec_prefix=\$${prefix}"        >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo "libdir=\$${exec_prefix}/lib"    >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo "includedir=\$${prefix}/include" >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo ""                               >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo "Name: shaderc"                  >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo "Description: Tools and libraries for Vulkan shader compilation" >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo "Version: 2023.8.1"              >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo "Libs: -L\$${libdir} -lshaderc_combined -lSPIRV-Tools-opt -lSPIRV-Tools -lSPIRV-Tools-link -lglslang" >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc; \
-	echo "Cflags: -I\$${includedir}"      >> $(BUILD_DIR)/lib/pkgconfig/shaderc.pc;
+	if [ ! -d $(ROOT)/libplacebo/.git ]; then \
+		rm -rf $(ROOT)/libplacebo; \
+		git clone --depth 1 --recurse-submodules https://github.com/haasn/libplacebo.git $(ROOT)/libplacebo; \
+	else \
+		echo "[OK] libbluray already exists"; \
+	fi; \
+	rm -rf $(ROOT)/libplacebo/build; \
+	cd $(ROOT)/libplacebo; \
+	meson setup build \
+		--prefix=$(BUILD_DIR) \
+		--buildtype=release \
+		--default-library=static \
+		-Dshaderc=disabled \
+		-Dvulkan=enabled \
+		-Dlcms=enabled; \
+	meson compile -C build; \
+	meson install -C build; \
+	sed -i 's/spirv-cross-c-shared >= [0-9.]*, //g' $(BUILD_DIR)/lib/pkgconfig/libplacebo.pc; \
+	sed -i 's|Libs:.*|Libs: -L$${libdir} -lplacebo -lm -lshlwapi -lglslang-default-resource-limits -lglslang -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lversion|' $(BUILD_DIR)/lib/pkgconfig/libplacebo.pc; \
+	$(call check_64bit,$(BUILD_DIR),$(BUILD_DIR)/lib/libplacebo.a); \
+	$(call check_static_purity,$(BUILD_DIR),$(BUILD_DIR)/lib/libplacebo.a); \
+	touch $@
 
 ## === AMF SDK ===
 amf_sdk: $(ROOT)/amf_sdk/.stamp-amf_sdk
@@ -572,19 +586,21 @@ $(ROOT)/amf_sdk/.stamp-amf_sdk:
 #   Not strictly required—FFmpeg will warn and auto-set it to 300—but this
 #   suppresses the warning.
 #
-# --enable-libshaderc
-# --extra-libs="-lshaderc"
-#   As of the full build in January 2026, Vulkan requires shaderc.
-#
 #
 ffmpeg: $(ROOT)/ffmpeg/.stamp-ffmpeg
 $(ROOT)/ffmpeg/.stamp-ffmpeg:
 	@set -e; \
 	if [ ! -d $(ROOT)/ffmpeg/.git ]; then \
-		git clone https://git.ffmpeg.org/ffmpeg.git $(ROOT)/ffmpeg; \
+		git clone --depth 1 https://git.ffmpeg.org/ffmpeg.git $(ROOT)/ffmpeg; \
 	else \
 		echo "[OK] FFmpeg source is already fetched"; \
 	fi; \
+	# \
+	# Stage the untouched pristine librav1e.a from MinGW system library to ensure \
+	# that FFmpeg's standalone configure check passes without missing symbols \
+	cp /mingw64/lib/librav1e.a $(BUILD_DIR)/lib/librav1e.a; \
+	# \
+	# configure \
 	cd $(ROOT)/ffmpeg; \
 	make clean || true; \
 	./configure \
@@ -638,18 +654,46 @@ $(ROOT)/ffmpeg/.stamp-ffmpeg:
 		--enable-libsoxr \
 		--enable-opencl \
 		--enable-vulkan \
-		--enable-libshaderc \
+		--enable-libplacebo \
 		--enable-amf \
 		--pkg-config-flags="--static" \
 		--extra-cflags="-I$(BUILD_DIR)/include -DKVZ_STATIC_LIB -DLIBTWOLAME_STATIC -DCL_TARGET_OPENCL_VERSION=300 -DVF_VPP_AMF_D3D11_HWACCEL" \
 		--extra-ldflags="-L$(BUILD_DIR)/lib -Wl,--Bstatic -Wl,--whole-archive -lgcc_eh -Wl,--no-whole-archive" \
-		--extra-libs="-l:libshaderc_combined.a -static -lstdc++ -lgomp -liconv -lintl -lharfbuzz -lcfgmgr32 -lole32 -static-libgcc -ld3d11"; \
+		--extra-libs="-static -lstdc++ -lgomp -liconv -lintl -lharfbuzz -lcfgmgr32 -lole32 -static-libgcc -ld3d11"; \
+	# \
+	# Resolve the multiple definition conflict of rust_eh_personality \
+	echo "[INFO] Patching librav1e.a to avoid Rust symbol conflict..."; \
+	rm -rf $(BUILD_DIR)/lib/librav1e.a.tmp_dir $(BUILD_DIR)/lib/librav1e.a.tmp; \
+	mkdir -p $(BUILD_DIR)/lib/librav1e.a.tmp_dir; \
+	cp $(BUILD_DIR)/lib/librav1e.a $(BUILD_DIR)/lib/librav1e.a.tmp; \
+	TARGET_OBJ=$$(nm $(BUILD_DIR)/lib/librav1e.a.tmp | awk '/:/ {obj=$$1} /T rust_eh_personality/ {print obj}' | tr -d ':'); \
+	if [ -n "$$TARGET_OBJ" ]; then \
+		cd $(BUILD_DIR)/lib/librav1e.a.tmp_dir && ar x $(BUILD_DIR)/lib/librav1e.a.tmp $$TARGET_OBJ; \
+		objcopy --localize-symbol=rust_eh_personality $(BUILD_DIR)/lib/librav1e.a.tmp_dir/$$TARGET_OBJ; \
+		ar r $(BUILD_DIR)/lib/librav1e.a.tmp $(BUILD_DIR)/lib/librav1e.a.tmp_dir/$$TARGET_OBJ; \
+		ranlib $(BUILD_DIR)/lib/librav1e.a.tmp; \
+	fi; \
+	rm -rf $(BUILD_DIR)/lib/librav1e.a.tmp_dir; \
+	mv $(BUILD_DIR)/lib/librav1e.a.tmp $(BUILD_DIR)/lib/librav1e.a; \
+	cd $(ROOT)/ffmpeg; \
+	# \
 	# Remove all -lgcc_s from config.mak to prevent libgcc_s_seh-1.dll from being linked \
+	echo "[INFO] Remove all -lgcc_s from config.mak..."; \
 	sed -i 's/-lgcc_s //g' ffbuild/config.mak; \
-	# Apply feature extension patches for vpp_amf \
-        patch -d $(ROOT)/ffmpeg/ -p1 < $(ROOT)/patches/vf_amf_common_c.patch; \
-        patch -d $(ROOT)/ffmpeg/ -p1 < $(ROOT)/patches/vf_amf_common_h.patch; \
-        patch -d $(ROOT)/ffmpeg/ -p1 < $(ROOT)/patches/vf_vpp_amf_c.patch; \
+	# \
+	# Apply feature extension patches for vpp_amf only if not already applied \
+	echo "[INFO] Checking and applying feature extension patches for vpp_amf..."; \
+	if patch -d $(ROOT)/ffmpeg/ -p1 --forward --dry-run --silent < $(ROOT)/patches/vf_vpp_amf_c.patch >/dev/null 2>&1; then \
+		echo "[INFO] Applying patches now..."; \
+		patch -d $(ROOT)/ffmpeg/ -p1 < $(ROOT)/patches/vf_amf_common_c.patch; \
+		patch -d $(ROOT)/ffmpeg/ -p1 < $(ROOT)/patches/vf_amf_common_h.patch; \
+		patch -d $(ROOT)/ffmpeg/ -p1 < $(ROOT)/patches/vf_vpp_amf_c.patch; \
+	else \
+		echo "[INFO] vpp_amf patches are already applied. Skipping."; \
+	fi; \
+	# \
+	# make / install \
+	echo "[INFO] make / install..."; \
 	make -j $(shell nproc); \
 	make install; \
 	$(call check_dll_whitelist,$(BUILD_DIR),$(BUILD_DIR)/bin/ffmpeg.exe); \
@@ -678,5 +722,3 @@ clean:
 	rm -rf $(ROOT)/vulkan_loader; \
 	rm -rf $(ROOT)/amf_sdk; \
 	rm -rf $(ROOT)/ffmpeg
-
-
