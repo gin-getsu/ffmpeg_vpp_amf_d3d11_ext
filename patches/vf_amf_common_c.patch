@@ -1,6 +1,6 @@
---- a/libavfilter/vf_amf_common.c	2026-03-27 12:23:24.275810600 +0900
-+++ a/libavfilter/vf_amf_common.c	2026-04-15 19:08:58.279662500 +0900
-@@ -38,6 +38,1254 @@
+--- a/libavfilter/vf_amf_common.c	2026-07-31 02:59:47.572300100 +0900
++++ b/libavfilter/vf_amf_common.c	2026-07-31 23:02:15.984309900 +0900
+@@ -39,6 +39,1253 @@
  #include <d3d11.h>
  #endif
  
@@ -1143,7 +1143,6 @@
 +     * If the downstream filter doesn't need a frame right now, do nothing
 +     */
 +    if (!ff_outlink_frame_wanted(outlink)) {
-+        av_log(ctx, AV_LOG_WARNING, "amf_activate : warn : ff_outlink_frame_wanted() return 0\n");
 +        return 0;
 +    }
 +
@@ -1255,7 +1254,7 @@
  int amf_filter_init(AVFilterContext *avctx)
  {
      AMFFilterContext     *ctx = avctx->priv;
-@@ -75,6 +1323,10 @@
+@@ -76,6 +1323,10 @@
      av_buffer_unref(&ctx->hwdevice_ref);
      av_buffer_unref(&ctx->hwframes_in_ref);
      av_buffer_unref(&ctx->hwframes_out_ref);
@@ -1266,7 +1265,7 @@
  }
  
  int amf_filter_filter_frame(AVFilterLink *inlink, AVFrame *in)
-@@ -99,6 +1351,66 @@
+@@ -100,6 +1351,66 @@
      if (ret < 0)
          goto fail;
  
@@ -1333,7 +1332,7 @@
      res = ctx->component->pVtbl->SubmitInput(ctx->component, (AMFData*)surface_in);
      surface_in->pVtbl->Release(surface_in); // release surface after use
      AMF_GOTO_FAIL_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "SubmitInput() failed with error %d\n", res);
-@@ -157,6 +1469,22 @@
+@@ -158,6 +1469,22 @@
      if (ctx->out_trc != AMF_COLOR_TRANSFER_CHARACTERISTIC_UNDEFINED)
          out->color_trc = ctx->out_trc;
  
@@ -1356,9 +1355,9 @@
  
      if (ret < 0)
          goto fail;
-@@ -286,6 +1614,59 @@
-                                         &ctx->width, &ctx->height)) < 0)
-         return err;
+@@ -292,6 +1619,59 @@
+         ctx->height = inlink->h;
+     }
  
 +#if VF_VPP_AMF_D3D11_HWACCEL
 +    if (strlen(ctx->w_expr) == 2 && strstr(ctx->w_expr, "iw")
@@ -1416,7 +1415,7 @@
      if (ctx->reset_sar && inlink->sample_aspect_ratio.num)
          w_adj = (double) inlink->sample_aspect_ratio.num / inlink->sample_aspect_ratio.den;
  
-@@ -591,6 +1972,20 @@
+@@ -606,6 +1986,20 @@
      }
  
      surface->pVtbl->SetPts(surface, frame->pts);

@@ -701,7 +701,7 @@ $(ROOT)/ffmpeg/.stamp-ffmpeg:
 	mkdir -p $(INSTALL_TO)/bin; \
 	mkdir -p $(INSTALL_TO)/doc; \
 	mkdir -p $(INSTALL_TO)/presets; \
-	cp -r $(BUILD_DIR)/bin/*.exe $(INSTALL_TO)/bin; \
+	cp -r $(BUILD_DIR)/bin/ff*.exe $(INSTALL_TO)/bin; \
 	cp -r $(BUILD_DIR)/share/doc/ffmpeg/* $(INSTALL_TO)/doc; \
 	cp -r $(BUILD_DIR)/share/ffmpeg/*.ffpreset $(INSTALL_TO)/presets; \
 	touch $@

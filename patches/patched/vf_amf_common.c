@@ -1178,7 +1178,6 @@ int amf_activate(AVFilterContext *avctx)
      * If the downstream filter doesn't need a frame right now, do nothing
      */
     if (!ff_outlink_frame_wanted(outlink)) {
-        av_log(ctx, AV_LOG_WARNING, "amf_activate : warn : ff_outlink_frame_wanted() return 0\n");
         return 0;
     }
 

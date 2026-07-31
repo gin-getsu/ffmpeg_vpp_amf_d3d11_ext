@@ -228,8 +228,12 @@ Refer to the ffmpeg source tree for full license details.
 ## 10. Change Log
 
 `2026/04/27`  
-Added --enable-libplacebo to ffmpeg configure
+Added --enable-libplacebo to ffmpeg configure.
 
 `2026/07/30`  
 Removed `--enable-libshaderc` from the FFmpeg configure options.  
 Switched to building `libplacebo` directly from source.
+
+`2026/07/31`  
+Removed warning logs that triggered when the downstream filter does  
+not require a frame immediately, preventing excessive log output.

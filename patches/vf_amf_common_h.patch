@@ -1,5 +1,5 @@
---- a/libavfilter/vf_amf_common.h	2026-03-27 12:23:24.281032400 +0900
-+++ a/libavfilter/vf_amf_common.h	2026-04-15 10:10:27.403433500 +0900
+--- a/libavfilter/vf_amf_common.h	2026-07-31 02:59:47.578300000 +0900
++++ b/libavfilter/vf_amf_common.h	2026-07-31 03:04:43.450781100 +0900
 @@ -26,6 +26,28 @@
  #include "libavutil/hwcontext_amf.h"
  #include "libavutil/mastering_display_metadata.h"
